@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mercado Agropecuario - Registro de Productos</title>
+  <style>
+    :root {
+      --primary: #2e7d32;
+      --primary-hover: #1b5e20;
+      --accent: #e65100;
+      --bg: #f4f6f8;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --border: #e0e0e0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 20px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    header h1 {
+      color: var(--primary);
+      font-size: 2rem;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 30px;
+    }
+
+    @media (min-width: 900px) {
+      .container {
+        grid-template-columns: 360px 1fr;
+      }
+    }
+
+    /* Formulario */
+    .form-card {
+      background: var(--card-bg);
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      height: fit-content;
+    }
+
+    .form-card h2 {
+      margin-bottom: 18px;
+      color: var(--primary);
+      font-size: 1.3rem;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+      font-size: 0.9rem;
+    }
+
+    .form-group input, 
+    .form-group select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    .form-group input:focus, 
+    .form-group select:focus {
+      border-color: var(--primary);
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .checkbox-group input {
+      width: auto;
+      cursor: pointer;
+    }
+
+    .btn-submit {
+      width: 100%;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-submit:hover {
+      background-color: var(--primary-hover);
+    }
+
+    /* Vista previa de imagen */
+    .image-preview {
+      width: 100%;
+      height: 150px;
+      border: 2px dashed var(--border);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #888;
+      margin-top: 8px;
+      overflow: hidden;
+      background-size: cover;
+      background-position: center;
+    }
+
+    /* Grilla de productos */
+    .products-header {
+      margin-bottom: 18px;
+      font-size: 1.3rem;
+      color: var(--primary);
+    }
+
+    .grid-products {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 20px;
+    }
+
+    .product-card {
+      background: var(--card-bg);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.06);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .product-img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      background-color: #eee;
+    }
+
+    .badge-oferta {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: var(--accent);
+      color: white;
+      font-size: 0.75rem;
+      font-weight: bold;
+      padding: 4px 10px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .product-info {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+
+    .product-title {
+      font-size: 1.1rem;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .product-provider {
+      font-size: 0.85rem;
+      color: #666;
+      margin-bottom: 12px;
+    }
+
+    .product-price-container {
+      margin-top: auto;
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .product-price {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: var(--primary);
+    }
+
+    .product-old-price {
+      font-size: 0.9rem;
+      color: #999;
+      text-decoration: line-through;
+    }
+
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 40px;
+      color: #777;
+      background: white;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🌱 Mercado Agropecuario</h1>
+    <p>Publicación de productos del campo directo del productor</p>
+  </header>
+
+  <div class="container">
+    
+    <!-- Formulario para agregar productos -->
+    <section class="form-card">
+      <h2>Publicar Producto</h2>
+      <form id="productForm">
+        
+        <div class="form-group">
+          <label for="providerName">Nombre del Proveedor / Granja</label>
+          <input type="text" id="providerName" placeholder="Ej. Agrícola San José" required>
+        </div>
+
+        <div class="form-group">
+          <label for="productName">Nombre del Producto</label>
+          <input type="text" id="productName" placeholder="Ej. Aguacate Hass, Maíz Blanco" required>
+        </div>
+
+        <div class="form-group">
+          <label for="price">Precio por Unidad/Kg ($)</label>
+          <input type="number" id="price" step="0.01" min="0" placeholder="0.00" required>
+        </div>
+
+        <div class="form-group">
+          <label for="imageInput">Foto del Producto</label>
+          <input type="file" id="imageInput" accept="image/*" required>
+          <div class="image-preview" id="imagePreview">Vista previa de imagen</div>
+        </div>
+
+        <div class="form-group checkbox-group">
+          <input type="checkbox" id="isOffer">
+          <label for="isOffer">¿Tiene precio de oferta?</label>
+        </div>
+
+        <div class="form-group" id="offerPriceGroup" style="display: none;">
+          <label for="offerPrice">Precio Oferta ($)</label>
+          <input type="number" id="offerPrice" step="0.01" min="0" placeholder="0.00">
+        </div>
+
+        <button type="submit" class="btn-submit">Publicar Producto</button>
+      </form>
+    </section>
+
+    <!-- Catálogo de productos publicadas -->
+    <section>
+      <h2 class="products-header">Productos Disponibles</h2>
+      <div class="grid-products" id="productsGrid">
+        <div class="empty-state">No hay productos cargados todavía.</div>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    const productForm = document.getElementById('productForm');
+    const isOfferCheckbox = document.getElementById('isOffer');
+    const offerPriceGroup = document.getElementById('offerPriceGroup');
+    const offerPriceInput = document.getElementById('offerPrice');
+    const imageInput = document.getElementById('imageInput');
+    const imagePreview = document.getElementById('imagePreview');
+    const productsGrid = document.getElementById('productsGrid');
+
+    let base64Image = '';
+    const products = [];
+
+    // Mostrar/ocultar el campo de precio de oferta
+    isOfferCheckbox.addEventListener('change', (e) => {
+      if (e.target.checked) {
+        offerPriceGroup.style.display = 'block';
+        offerPriceInput.setAttribute('required', 'true');
+      } else {
+        offerPriceGroup.style.display = 'none';
+        offerPriceInput.removeAttribute('required');
+        offerPriceInput.value = '';
+      }
+    });
+
+    // Procesar y previsualizar la imagen cargada
+    imageInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          base64Image = event.target.result;
+          imagePreview.style.backgroundImage = `url(${base64Image})`;
+          imagePreview.textContent = '';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Manejar envío del formulario
+    productForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const newProduct = {
+        id: Date.now(),
+        provider: document.getElementById('providerName').value,
+        name: document.getElementById('productName').value,
+        price: parseFloat(document.getElementById('price').value),
+        image: base64Image,
+        isOffer: isOfferCheckbox.checked,
+        offerPrice: isOfferCheckbox.checked ? parseFloat(offerPriceInput.value) : null
+      };
+
+      products.push(newProduct);
+      renderProducts();
+
+      // Limpiar formulario
+      productForm.reset();
+      imagePreview.style.backgroundImage = 'none';
+      imagePreview.textContent = 'Vista previa de imagen';
+      offerPriceGroup.style.display = 'none';
+      base64Image = '';
+    });
+
+    // Renderizar la lista de productos
+    function renderProducts() {
+      if (products.length === 0) {
+        productsGrid.innerHTML = '<div class="empty-state">No hay productos cargados todavía.</div>';
+        return;
+      }
+
+      productsGrid.innerHTML = products.map(product => {
+        const currentPrice = product.isOffer ? product.offerPrice : product.price;
+        
+        return `
+          <div class="product-card">
+            ${product.isOffer ? '<span class="badge-oferta">Oferta</span>' : ''}
+            <img src="${product.image}" class="product-img" alt="${product.name}">
+            <div class="product-info">
+              <div class="product-title">${product.name}</div>
+              <div class="product-provider">👨‍🌾 ${product.provider}</div>
+              <div class="product-price-container">
+                <span class="product-price">$${currentPrice.toFixed(2)}</span>
+                ${product.isOffer ? `<span class="product-old-price">$${product.price.toFixed(2)}</span>` : ''}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+  </script>
+
+</body>
+</html>
