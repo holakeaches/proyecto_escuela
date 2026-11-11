@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Menú Principal - Mercado Agropecuario</title>
+  <style>
+    :root {
+      --primary: #2e7d32;
+      --primary-hover: #1b5e20;
+      --accent: #e65100;
+      --bg: #f4f6f8;
+      --card-bg: #ffffff;
+      --text: #333333;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .menu-card {
+      background: var(--card-bg);
+      padding: 36px 32px;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+    }
+
+    .menu-card h2 {
+      color: var(--primary);
+      margin-bottom: 6px;
+      font-size: 1.6rem;
+    }
+
+    .menu-card p {
+      color: #666;
+      font-size: 0.95rem;
+      margin-bottom: 28px;
+    }
+
+    .buttons-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .btn-menu {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      background-color: var(--primary);
+      color: white;
+      text-decoration: none;
+      padding: 14px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 1rem;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .btn-menu:hover {
+      background-color: var(--primary-hover);
+      transform: translateY(-2px);
+    }
+
+    .btn-menu.accent {
+      background-color: var(--accent);
+    }
+
+    .btn-menu.accent:hover {
+      background-color: #c63f00;
+    }
+
+    .btn-logout {
+      margin-top: 24px;
+      background: transparent;
+      border: none;
+      color: #888;
+      font-size: 0.85rem;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .btn-logout:hover {
+      color: #d32f2f;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="menu-card">
+    <h2>🌾 Menú Principal</h2>
+    <p>Selecciona la acción que deseas realizar</p>
+
+    <div class="buttons-container">
+      <!-- Botón 1: Subir/Gestionar Productos (gerente.html) -->
+      <a href="gerente.html" class="btn-menu">
+        📦 Gestión de Productos (Gerente)
+      </a>
+
+      <!-- Botón 2: Ingeniero de Suelo (ing_suelo.html) -->
+      <a href="ing_suelo.html" class="btn-menu accent">
+        🌱 Recomendaciones de Suelo
+      </a>
+    </div>
+
+    <!-- Opción para cerrar sesión -->
+    <button class="btn-logout" id="btnLogout">Cerrar Sesión</button>
+  </div>
+
+  <script>
+    // Botón para cerrar sesión e ir al login
+    document.getElementById('btnLogout').addEventListener('click', () => {
+      localStorage.removeItem('usuarioLogueado');
+      window.location.href = 'index.html';
+    });
+  </script>
+
+</body>
+</html>

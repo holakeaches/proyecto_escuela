@@ -84,6 +84,9 @@
       margin-bottom: 16px;
       display: none;
       text-align: center;
+      background-color: #ffebee;
+      padding: 8px;
+      border-radius: 4px;
     }
 
     .btn-login {
@@ -123,27 +126,50 @@
         <input type="password" id="password" placeholder="Ingresa tu contraseña" required>
       </div>
 
-      <button type="submit" class="btn-login">Iniciar Sesión</button>
+      <button type="submit" class="btn-login" id="btnLogin">Iniciar Sesión</button>
     </form>
   </div>
 
   <script>
+    const API_URL = 'http://localhost:3000/api/login';
     const loginForm = document.getElementById('loginForm');
     const errorMsg = document.getElementById('errorMsg');
+    const btnLogin = document.getElementById('btnLogin');
 
-    loginForm.addEventListener('submit', (e) => {
+    loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      const user = document.getElementById('username').value.trim();
-      const pass = document.getElementById('password').value.trim();
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
 
-      // Validación: usuario "gerente" y contraseña "gerente"
-      if (user === 'gerente' && pass === 'gerente') {
-        // Redirige al archivo gerente.html en la misma carpeta
-        window.location.href = 'gerente.html';
-      } else {
-        // Muestra mensaje de error si los datos no coinciden
+      errorMsg.style.display = 'none';
+      btnLogin.textContent = 'Verificando...';
+      btnLogin.disabled = true;
+
+      try {
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          localStorage.setItem('usuarioLogueado', JSON.stringify(data.empleado));
+          // Redirige al panel principal del gerente
+          //window.location.href = 'gerente.html';
+          window.location.href = 'menu.html';
+        } else {
+          errorMsg.textContent = data.message || 'Usuario o contraseña incorrectos';
+          errorMsg.style.display = 'block';
+        }
+      } catch (error) {
+        errorMsg.textContent = 'Error: No se pudo conectar con el servidor (node server.js)';
         errorMsg.style.display = 'block';
+      } finally {
+        btnLogin.textContent = 'Iniciar Sesión';
+        btnLogin.disabled = false;
       }
     });
   </script>

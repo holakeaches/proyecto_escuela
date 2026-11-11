@@ -221,6 +221,18 @@
       text-decoration: line-through;
     }
 
+    /* Etiqueta visual para la compra mínima en el producto */
+    .min-purchase-tag {
+      margin-top: 8px;
+      padding: 6px 10px;
+      background-color: #fff3e0;
+      border-left: 3px solid var(--accent);
+      border-radius: 4px;
+      font-size: 0.8rem;
+      color: #d84315;
+      font-weight: 600;
+    }
+
     .empty-state {
       grid-column: 1 / -1;
       text-align: center;
@@ -256,7 +268,7 @@
         </div>
 
         <div class="form-group">
-          <label for="price">Precio por Unidad/Kg ($)</label>
+          <label for="price">Precio Unitario / Kg Regular ($)</label>
           <input type="number" id="price" step="0.01" min="0" placeholder="0.00" required>
         </div>
 
@@ -266,14 +278,23 @@
           <div class="image-preview" id="imagePreview">Vista previa de imagen</div>
         </div>
 
+        <!-- Casilla para habilitar oferta -->
         <div class="form-group checkbox-group">
           <input type="checkbox" id="isOffer">
-          <label for="isOffer">¿Tiene precio de oferta?</label>
+          <label for="isOffer">¿Aplicar descuento por compra mínima?</label>
         </div>
 
-        <div class="form-group" id="offerPriceGroup" style="display: none;">
-          <label for="offerPrice">Precio Oferta ($)</label>
-          <input type="number" id="offerPrice" step="0.01" min="0" placeholder="0.00">
+        <!-- Opciones de oferta desplegables -->
+        <div id="offerFields" style="display: none;">
+          <div class="form-group">
+            <label for="minPurchase">Cantidad Mínima para Descuento (Kg/Unid)</label>
+            <input type="number" id="minPurchase" min="1" step="1" placeholder="Ej. 10">
+          </div>
+
+          <div class="form-group">
+            <label for="offerPrice">Precio con Descuento ($/Unid)</label>
+            <input type="number" id="offerPrice" step="0.01" min="0" placeholder="0.00">
+          </div>
         </div>
 
         <button type="submit" class="btn-submit">Publicar Producto</button>
@@ -293,8 +314,9 @@
   <script>
     const productForm = document.getElementById('productForm');
     const isOfferCheckbox = document.getElementById('isOffer');
-    const offerPriceGroup = document.getElementById('offerPriceGroup');
+    const offerFields = document.getElementById('offerFields');
     const offerPriceInput = document.getElementById('offerPrice');
+    const minPurchaseInput = document.getElementById('minPurchase');
     const imageInput = document.getElementById('imageInput');
     const imagePreview = document.getElementById('imagePreview');
     const productsGrid = document.getElementById('productsGrid');
@@ -302,19 +324,22 @@
     let base64Image = '';
     const products = [];
 
-    // Mostrar/ocultar el campo de precio de oferta
+    // Mostrar u ocultar etiquetas e inputs de compra mínima
     isOfferCheckbox.addEventListener('change', (e) => {
       if (e.target.checked) {
-        offerPriceGroup.style.display = 'block';
+        offerFields.style.display = 'block';
         offerPriceInput.setAttribute('required', 'true');
+        minPurchaseInput.setAttribute('required', 'true');
       } else {
-        offerPriceGroup.style.display = 'none';
+        offerFields.style.display = 'none';
         offerPriceInput.removeAttribute('required');
+        minPurchaseInput.removeAttribute('required');
         offerPriceInput.value = '';
+        minPurchaseInput.value = '';
       }
     });
 
-    // Procesar y previsualizar la imagen cargada
+    // Vista previa de imagen
     imageInput.addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (file) {
@@ -332,14 +357,17 @@
     productForm.addEventListener('submit', (e) => {
       e.preventDefault();
 
+      const isOffer = isOfferCheckbox.checked;
+
       const newProduct = {
         id: Date.now(),
         provider: document.getElementById('providerName').value,
         name: document.getElementById('productName').value,
         price: parseFloat(document.getElementById('price').value),
         image: base64Image,
-        isOffer: isOfferCheckbox.checked,
-        offerPrice: isOfferCheckbox.checked ? parseFloat(offerPriceInput.value) : null
+        isOffer: isOffer,
+        minPurchase: isOffer ? parseInt(minPurchaseInput.value, 10) : null,
+        offerPrice: isOffer ? parseFloat(offerPriceInput.value) : null
       };
 
       products.push(newProduct);
@@ -349,7 +377,7 @@
       productForm.reset();
       imagePreview.style.backgroundImage = 'none';
       imagePreview.textContent = 'Vista previa de imagen';
-      offerPriceGroup.style.display = 'none';
+      offerFields.style.display = 'none';
       base64Image = '';
     });
 
@@ -361,19 +389,25 @@
       }
 
       productsGrid.innerHTML = products.map(product => {
-        const currentPrice = product.isOffer ? product.offerPrice : product.price;
-        
         return `
           <div class="product-card">
-            ${product.isOffer ? '<span class="badge-oferta">Oferta</span>' : ''}
+            ${product.isOffer ? '<span class="badge-oferta">Mayoreo</span>' : ''}
             <img src="${product.image}" class="product-img" alt="${product.name}">
             <div class="product-info">
               <div class="product-title">${product.name}</div>
               <div class="product-provider">👨‍🌾 ${product.provider}</div>
+              
               <div class="product-price-container">
-                <span class="product-price">$${currentPrice.toFixed(2)}</span>
-                ${product.isOffer ? `<span class="product-old-price">$${product.price.toFixed(2)}</span>` : ''}
+                <span class="product-price">$${product.price.toFixed(2)}</span>
+                <span style="font-size: 0.8rem; color: #666;">/ unidad</span>
               </div>
+
+              ${product.isOffer ? `
+                <div class="min-purchase-tag">
+                  🏷️ <strong>$${product.offerPrice.toFixed(2)}</strong> c/u llevando <strong>${product.minPurchase}</strong> o más
+                </div>
+              ` : ''}
+
             </div>
           </div>
         `;

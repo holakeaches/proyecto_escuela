@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ingeniero de Suelo - Mercado Agropecuario</title>
+  <style>
+    :root {
+      --primary: #2e7d32;
+      --primary-hover: #1b5e20;
+      --accent: #e65100;
+      --danger: #d32f2f;
+      --bg: #f4f6f8;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --border: #e0e0e0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); line-height: 1.6; padding: 20px; }
+    
+    header { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto 30px auto; }
+    header h1 { color: var(--primary); font-size: 1.8rem; }
+    
+    .btn-back {
+      background-color: #666; color: white; text-decoration: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; font-size: 0.9rem;
+    }
+
+    .container {
+      max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr; gap: 30px;
+    }
+
+    @media (min-width: 900px) {
+      .container { grid-template-columns: 380px 1fr; }
+    }
+
+    .form-card {
+      background: var(--card-bg); padding: 24px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); height: fit-content;
+    }
+
+    .form-card h2 { margin-bottom: 18px; color: var(--primary); font-size: 1.3rem; }
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-weight: 600; margin-bottom: 4px; font-size: 0.85rem; }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.9rem; outline: none;
+    }
+    .form-group textarea { resize: vertical; min-height: 70px; }
+
+    .btn-submit {
+      width: 100%; background-color: var(--primary); color: white; border: none; padding: 12px;
+      border-radius: 6px; font-weight: bold; font-size: 1rem; cursor: pointer; transition: background 0.2s; margin-top: 10px;
+    }
+    .btn-submit:hover { background-color: var(--primary-hover); }
+
+    .btn-cancel {
+      width: 100%; background-color: #888; color: white; border: none; padding: 8px;
+      border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 6px; display: none;
+    }
+
+    .grid-parcelas { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+
+    .parcela-card {
+      background: var(--card-bg); border-radius: 10px; border-top: 4px solid var(--primary);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.06); padding: 18px; position: relative; display: flex; flex-direction: column; gap: 8px;
+    }
+
+    .parcela-title { font-size: 1.1rem; font-weight: bold; color: var(--primary); }
+    .parcela-info { font-size: 0.85rem; color: #555; }
+    .tag-clima { display: inline-block; background: #e8f5e9; color: var(--primary); padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
+
+    .recomendacion-box {
+      margin-top: 6px; padding: 10px; background-color: #fff3e0; border-left: 3px solid var(--accent); border-radius: 4px; font-size: 0.82rem; color: #d84315;
+    }
+
+    .actions-bar { display: flex; gap: 8px; margin-top: 12px; }
+    .btn-edit { flex: 1; background-color: #0288d1; color: white; border: none; padding: 6px; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.8rem; }
+    .btn-delete { flex: 1; background-color: var(--danger); color: white; border: none; padding: 6px; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.8rem; }
+
+    .empty-state { grid-column: 1 / -1; text-align: center; padding: 40px; color: #777; background: white; border-radius: 8px; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🌱 Estudio e Ingeniería de Suelo</h1>
+    <a href="menu.html" class="btn-back">⬅ Volver al Menú</a>
+  </header>
+
+  <div class="container">
+    
+    <!-- Formulario para agregar / editar parcela -->
+    <section class="form-card">
+      <h2 id="formTitle">Registrar Nueva Parcela</h2>
+      <form id="parcelaForm">
+        <input type="hidden" id="parcelaId">
+        
+        <div class="form-group">
+          <label for="ubicacion">Ubicación / Nombre Parcela</label>
+          <input type="text" id="ubicacion" placeholder="Ej. Rancho El Limonal - Sector A" required>
+        </div>
+
+        <div class="form-group">
+          <label for="superficie">Superficie / Tamaño (Hectáreas)</label>
+          <input type="number" id="superficie" step="0.1" min="0" placeholder="Ej. 5.5" required>
+        </div>
+
+        <div class="form-group">
+          <label for="cultivo">Tipo de Cultivo / Planta</label>
+          <input type="text" id="cultivo" placeholder="Ej. Maíz, Aguacate, Limón" required>
+        </div>
+
+        <div class="form-group">
+          <label for="tipo_suelo">Características de Tierra / Clima / Humedad</label>
+          <input type="text" id="tipo_suelo" placeholder="Ej. Arcilloso - 28°C Clima Cálido - Humedad 75%" required>
+        </div>
+
+        <div class="form-group">
+          <label for="fecha_estudio">Fecha y Hora del Estudio</label>
+          <input type="datetime-local" id="fecha_estudio" required>
+        </div>
+
+        <div class="form-group">
+          <label for="recomendacion">Materiales Necesarios / Recomendaciones del Suelo</label>
+          <textarea id="recomendacion" placeholder="Ej. Aplicar 200kg de Fertilizante NPK + Cal agrícola para nivelar pH"></textarea>
+        </div>
+
+        <button type="submit" class="btn-submit" id="btnSave">Guardar Parcela</button>
+        <button type="button" class="btn-cancel" id="btnCancel">Cancelar Edición</button>
+      </form>
+    </section>
+
+    <!-- Lista de Parcelas -->
+    <section>
+      <h2 style="margin-bottom: 18px; color: var(--primary);">Parcelas y Estudios de Suelo</h2>
+      <div class="grid-parcelas" id="parcelasGrid">
+        <div class="empty-state">Cargando parcelas...</div>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    const API_URL = 'http://localhost:3000/api/parcelas';
+    const parcelaForm = document.getElementById('parcelaForm');
+    const parcelasGrid = document.getElementById('parcelasGrid');
+    const formTitle = document.getElementById('formTitle');
+    const btnSave = document.getElementById('btnSave');
+    const btnCancel = document.getElementById('btnCancel');
+
+    let parcelasCache = [];
+
+    // Cargar parcelas al iniciar la página
+    document.addEventListener('DOMContentLoaded', loadParcelas);
+
+    async function loadParcelas() {
+      try {
+        const res = await fetch(API_URL);
+        parcelasCache = await res.json();
+        renderParcelas(parcelasCache);
+      } catch (err) {
+        parcelasGrid.innerHTML = '<div class="empty-state">Error al conectar con el servidor.</div>';
+      }
+    }
+
+    function renderParcelas(parcelas) {
+      if (!parcelas || parcelas.length === 0) {
+        parcelasGrid.innerHTML = '<div class="empty-state">No hay parcelas registradas en el sistema.</div>';
+        return;
+      }
+
+      parcelasGrid.innerHTML = parcelas.map(p => `
+        <div class="parcela-card">
+          <div class="parcela-title">📍 ${p.ubicacion}</div>
+          <div class="parcela-info">📐 <strong>Tamaño:</strong> ${p.superficie} Hectáreas</div>
+          <div class="parcela-info">🌾 <strong>Cultivo:</strong> ${p.cultivo}</div>
+          <div><span class="tag-clima">🧪 ${p.tipo_suelo}</span></div>
+          <div class="parcela-info">📅 <strong>Estudio:</strong> ${p.fecha_inicio ? p.fecha_inicio.replace('T', ' ').substring(0, 16) : 'N/A'}</div>
+
+          ${p.recomendacion ? `
+            <div class="recomendacion-box">
+              ⚠️ <strong>Materiales/Tratamiento:</strong><br>${p.recomendacion}
+            </div>
+          ` : ''}
+
+          <div class="actions-bar">
+            <button class="btn-edit" onclick="editParcela(${p.id_parcela})">Editar</button>
+            <button class="btn-delete" onclick="deleteParcela(${p.id_parcela})">Eliminar</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Guardar o Actualizar
+    parcelaForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const id = document.getElementById('parcelaId').value;
+      const payload = {
+        ubicacion: document.getElementById('ubicacion').value,
+        superficie: parseFloat(document.getElementById('superficie').value),
+        cultivo: document.getElementById('cultivo').value,
+        tipo_suelo: document.getElementById('tipo_suelo').value,
+        fecha_estudio: document.getElementById('fecha_estudio').value,
+        recomendacion: document.getElementById('recomendacion').value
+      };
+
+      const isEdit = Boolean(id);
+      const url = isEdit ? `${API_URL}/${id}` : API_URL;
+      const method = isEdit ? 'PUT' : 'POST';
+
+      try {
+        const res = await fetch(url, {
+          method: method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+          resetForm();
+          loadParcelas();
+        }
+      } catch (err) {
+        alert('Error al guardar los datos de la parcela');
+      }
+    });
+
+    // Cargar datos en el formulario para Editar
+    window.editParcela = function(id) {
+      const p = parcelasCache.find(item => item.id_parcela === id);
+      if (!p) return;
+
+      document.getElementById('parcelaId').value = p.id_parcela;
+      document.getElementById('ubicacion').value = p.ubicacion || '';
+      document.getElementById('superficie').value = p.superficie || '';
+      document.getElementById('cultivo').value = p.cultivo || '';
+      document.getElementById('tipo_suelo').value = p.tipo_suelo || '';
+      document.getElementById('fecha_estudio').value = p.fecha_inicio ? p.fecha_inicio.substring(0, 16) : '';
+      document.getElementById('recomendacion').value = p.recomendacion || '';
+
+      formTitle.textContent = 'Editar Parcela / Análisis';
+      btnSave.textContent = 'Actualizar Cambios';
+      btnCancel.style.display = 'block';
+    };
+
+    // Eliminar Parcela
+    window.deleteParcela = async function(id) {
+      if (!confirm('¿Estás seguro de eliminar esta parcela del registro?')) return;
+
+      try {
+        const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+        if (res.ok) loadParcelas();
+      } catch (err) {
+        alert('Error al eliminar la parcela');
+      }
+    };
+
+    // Cancelar Edición
+    btnCancel.addEventListener('click', resetForm);
+
+    function resetForm() {
+      parcelaForm.reset();
+      document.getElementById('parcelaId').value = '';
+      formTitle.textContent = 'Registrar Nueva Parcela';
+      btnSave.textContent = 'Guardar Parcela';
+      btnCancel.style.display = 'none';
+    }
+  </script>
+
+</body>
+</html>
